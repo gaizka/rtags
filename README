@@ -1,0 +1,19 @@
+This is the original commit of the rtags source code as written by Keiju
+ISHITSUKA as part of the irb project. Now irb has moved into the main Ruby
+source tree rtags has become an independent project.
+
+At this point you can just run rtags in lieu of ctags, provided irb is
+installed on your system. It works alright!
+
+We aim to provide a better installation routine and a unit test frame work
+before improving the code base.
+
+rtags is distributed under a RUBY LICENSE and is hosted at rubyforge:
+
+  http://rubyforge.org/projects/rtags/
+
+For more information see ./bin/rtags
+
+Current maintainer:
+
+Pjotr Prins
