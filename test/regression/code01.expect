@@ -1,0 +1,9 @@
+::That::Ritz    /s/foo.rb /^class Ritz/
+::That::Ritz#mymy       /s/foo.rb /^      def mymy/
+::That::Sothere /s/foo.rb /^      class Sothere/
+::That::Sothere#mymy    /s/foo.rb /^              def mymy/
+Ritz    /s/foo.rb /^class Ritz/
+Sothere /s/foo.rb /^      class Sothere/
+That    /s/foo.rb /^module That/
+mymy    /s/foo.rb /^              def mymy/
+mymy    /s/foo.rb /^      def mymy/

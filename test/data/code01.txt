@@ -1,0 +1,12 @@
+module That
+        class Sothere
+                def mymy
+                end
+
+        end
+class Ritz
+        MY_CONST = 4
+        def mymy
+                end
+        end
+end
