@@ -5,8 +5,9 @@ source tree rtags has become an independent project.
 At this point you can just run rtags in lieu of ctags, provided irb is
 installed on your system. It works alright!
 
-We aim to provide a better installation routine and a unit test frame work
-before improving the code base.
+We aim to provide a better installation routine using gems, and a unit
+test frame work before improving the code base. For now you can use
+the ./install.sh script included.
 
 rtags is distributed under a RUBY LICENSE and is hosted at rubyforge:
 

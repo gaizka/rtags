@@ -3,10 +3,14 @@
 #		rtags is a Ruby replacement for ctags - allowing for name navigation in
 #		source code using vim, emacs and others.
 #
+#		Install using the install.sh script.
+#
 #   LICENSE: RUBY LICENSE - see LICENSE.TXT
 #
 #		THIS IS THE ORIGINAL CHECK-IN BASED ON THE LATEST VERSION RECEIVED FROM:
 #
+#     Release Version: 0.91 - public release using irb 0.9
+#     
 #   rtags.rb - 
 #   	Release Version: 0.9
 #   	Revision: 1.13 
@@ -17,6 +21,24 @@
 #
 #   
 #
+
+RTAGS_VERSION='0.91 (July 2006)'
+
+usage = <<USAGE
+
+	rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA:
+	
+	A Ruby tool for using Ruby tags with vim or emacs
+	http://rubyforge.org/projects/rtags/ - maintainer Pjotr Prins
+
+	usage:
+
+		rtags [--vi] filenames
+
+	by default creates an emacs tags file. With the --vi switch
+	a vim tags file is created instead.
+
+USAGE
 
 require "e2mmap"
 require "tracer"
@@ -505,6 +527,12 @@ module RTAGS
       end
     end
   end
+end
+
+if ARGV.size == 0 or ARGV[0] == '--help'
+	ARGV.shift
+	print usage
+	exit 1
 end
 
 if /--?vi/ =~ ARGV[0]
