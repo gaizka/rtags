@@ -23,7 +23,8 @@ spec = Gem::Specification.new do |s|
 	s.executables << 'rtags'
 	
 	s.required_ruby_version = '>= 1.8.1'
-	s.autorequire = ''
+	s.autorequire = 'irb'
+	# s.add_dependency( "irb", ">= 0.9" )
 	s.author = "Pjotr Prins, Keiju Ishitsuka"
 	s.email = "pjotr.public02@thebird.nl"
 	s.rubyforge_project = "rtags"
