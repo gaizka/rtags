@@ -77,7 +77,7 @@ function fail()
   make="env LD_RUN_PATH=${libdir} LD_LIBRARY_PATH=${libdir} make"
   ruby=`which ruby`
 	irb=`which irb`
-	rtags='./bin/rtags.rb'
+	rtags='./bin/rtags'
 #
 # Test dependencies
 #
