@@ -1,44 +1,75 @@
 #!/usr/bin/env ruby
 #
-#		rtags is a Ruby replacement for ctags - allowing for name navigation in
-#		source code using vim, emacs and others.
-#
-#		Install using the install.sh script.
-#
-#   LICENSE: RUBY LICENSE - see LICENSE.TXT
-#
-#		THIS IS THE ORIGINAL CHECK-IN BASED ON THE LATEST VERSION RECEIVED FROM:
-#
-#     Release Version: 0.91 - public release using irb 0.9
-#     
-#   rtags.rb - 
-#   	Release Version: 0.9
-#   	Revision: 1.13 
-#   	Date: 2002/07/09 10:26:38 
-#   	by Keiju ISHITSUKA(Nippon Rational Inc.)
-#
-# --
-#
+#   rtags is a Ruby replacement for ctags - allowing for name navigation in
+#   source code using vim, emacs and others.
 #   
-#
+#   by Keiju ISHITSUKA and Pjotr Prins
+#   
+#   LICENSE: RUBY LICENSE - see file LICENSE.TXT
+#   INSTALL: see file README
+#   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.91 (July 2006)'
+RTAGS_VERSION='0.92 (August 2006)'
+
+require 'optparse'
+require 'ostruct'
 
 usage = <<USAGE
 
-	rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA:
-	
-	A Ruby tool for using Ruby tags with vim or emacs
-	http://rubyforge.org/projects/rtags/ - maintainer Pjotr Prins
+        rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA:
+        
+        A Ruby tool for using Ruby tags with vim or emacs
+        http://rubyforge.org/projects/rtags/ - maintainer Pjotr Prins
 
-	usage:
+        usage:
 
-		rtags [--vi] filenames
+                rtags [--vi] filenames
 
-	by default creates an emacs tags file. With the --vi switch
-	a vim tags file is created instead.
+        by default creates an emacs tags file. With the --vi switch
+        a vim tags file is created instead.
 
 USAGE
+
+
+$options = OpenStruct.new()
+opts = OptionParser.new() { |opts|
+  opts.on_tail("-h", "--help", "Print this message") {
+	 	print(usage)
+    print(opts)
+    print <<EXAMPLE
+    
+Examples:
+
+    rtags *.rb
+		
+EXAMPLE
+    exit()
+  }
+   
+  opts.on("-f tagfile", String, "Output to tagfile (default 'TAGS')") do
+    $options.tagfile = s
+  end
+  opts.on("--vi", "Use vi type tags (default is emacs)") do 
+    $options.vi = true
+  end
+  opts.on("--debug", "Debug output to stdout") do 
+    $options.debug = true
+  end
+  opts.on("--debug_tokens", "Debug token information to stdout") do 
+    $options.debug_tokens = true
+  end
+}
+opts.parse!(ARGV)
+
+if $options.tagfile == nil
+	if $options.vi
+		$options.tagfile = 'tags' 
+	else
+		$options.tagfile = 'TAGS' 
+	end
+end
+
+$stderr.print "Writing to file #{$options.tagfile}\n" if $options.debug
 
 require "e2mmap"
 require "tracer"
@@ -46,11 +77,8 @@ require "tracer"
 require "irb/ruby-lex"
 require "irb/ruby-token"
 
-$DEBUG = true
-#$TOKEN_DEBUG = true
-
 module RTAGS
-  @RCS_ID='-$Id: rtags.rb,v 1.13 2002/07/09 10:26:38 keiju Exp keiju $-'
+  @RCS_ID='-rtags.rb 0.92-'
 
   class RTToken
     def initialize(readed, context, name, token)
@@ -162,26 +190,26 @@ module RTAGS
 
     def scan(&block)
       File.open(@input_file_name) do
-	|input|
-	@tokens = []
-	@unget_readed = []
-	@readed = []
-	@scanner.set_input(input)
-	parse_statements(&block)
+        |input|
+        @tokens = []
+        @unget_readed = []
+        @readed = []
+        @scanner.set_input(input)
+        parse_statements(&block)
       end
     end
 
     def get_tk
       if @tokens.empty?
-	tk = @scanner.token
-	@readed.push @scanner.get_readed
-	p tk if $TOKEN_DEBUG
-	tk
+        tk = @scanner.token
+        @readed.push @scanner.get_readed
+        $stderr.p tk if $options.debug_tokens
+        tk
       else
-	@readed.push @unget_readed.shift
-	tk = @tokens.shift
-	p tk if $TOKEN_DEBUG
-	tk
+        @readed.push @unget_readed.shift
+        tk = @tokens.shift
+        $stderr.p tk if $options.debug_tokens
+        tk
       end
     end
 
@@ -198,8 +226,8 @@ module RTAGS
     def skip_tkspace(skip_nl = true)
       tokens = []
       while ((tk = get_tk).kind_of?(TkSPACE) ||
-	     (skip_nl && tk.kind_of?(TkNL)))
-	tokens.push tk
+             (skip_nl && tk.kind_of?(TkNL)))
+        tokens.push tk
       end
       unget_tk(tk)
       tokens
@@ -215,74 +243,83 @@ module RTAGS
     SINGLE = "<<"
 
     def parse_statements(context = nil, single = NORMAL, &block)
-      nest = 1
+			begin
+	      nest = 1
 
-      while tk = get_tk
-	case tk
-	when TkCLASS
-	  parse_class(context, single, tk, &block)
-	when TkMODULE
-	  parse_module(context, single, tk, &block)
-	when TkDEF
-	  nest += 1
-	  parse_method(context, single, tk, &block)
-	when TkALIAS
-	  parse_alias(context, single, tk, &block)
-	when TkCASE,
-	    TkDO,
-	    TkFOR,
-	    TkIF,
-	    TkUNLESS,
-	    TkUNTIL,
-	    TkWHILE, 
-	    TkBEGIN
-	  nest += 1
-	when TkIDENTIFIER
-	  case tk.name
-	  when "attr"
-	    parse_attr(context, single, tk, &block)
-	  when /^attr_(reader|writer|accessor)$/
-	    parse_attr_accessor(context, single, tk, &block)
-	  end
-	when TkEND
-	  return if (nest -= 1) == 0
-	end
-	begin
-	  get_tkreaded
-	  skip_tkspace(false)
-	end while peek_tk == TkNL
-      end
+  	    while tk = get_tk
+    	    case tk
+      	  when TkCLASS
+        	  parse_class(context, single, tk, &block)
+        	when TkMODULE
+          	parse_module(context, single, tk, &block)
+        	when TkDEF
+          	nest += 1
+          	parse_method(context, single, tk, &block)
+        	when TkALIAS
+          	parse_alias(context, single, tk, &block)
+        	when TkCASE,
+          	   TkDO,
+             	 TkFOR,
+            	 TkIF,
+            	 TkUNLESS,
+            	 TkUNTIL,
+           	 	 TkWHILE, 
+            	 TkBEGIN
+          	nest += 1
+	        when TkIDENTIFIER
+           	case tk.name
+           	when "attr"
+            	parse_attr(context, single, tk, &block)
+          	when /^attr_(reader|writer|accessor)$/
+            	parse_attr_accessor(context, single, tk, &block)
+          	end
+        	when TkEND
+          	return if (nest -= 1) == 0
+        	end
+        	begin
+          	get_tkreaded
+          	skip_tkspace(false)
+        	end while peek_tk == TkNL
+      	end
+			rescue
+        print "\n\nFATAL: Parse error\n"
+				print "context="
+				p context
+				print "\nblock="
+				p &block
+				raise $!
+			end
     end
 
     def parse_class(context, single, tk, &block)
       skip_tkspace
       case name_t = get_tk
       when TkCONSTANT
-	name = name_t.name
-	if single == SINGLE
-	  yield RTSingleClass.new(get_tkreaded, context, name, tk)
-	else
-	  yield RTClass.new(get_tkreaded, context, name, tk)
-	end
-	parse_statements((context || "") + single + name, &block)
+        name = name_t.name
+        if single == SINGLE
+          yield RTSingleClass.new(get_tkreaded, context, name, tk)
+        else
+          yield RTClass.new(get_tkreaded, context, name, tk)
+        end
+        parse_statements((context || "") + single + name, &block)
 
       when TkLSHFT
-	skip_tkspace
-	case name_t2 = get_tk
-	when TkSELF
-	  parse_statements(context, SINGLE, &block)
-	when TkCONSTANT
-#	  yield RTSingleClass.new(get_tkreaded, context, name_t2.name, tk)
-	  parse_statements((context || "") + "::" + name_t2.name, 
-			   SINGLE, 
-			   &block)
-	else
-	  printf "Warn: I don't recognize this token(%s)", name_t2.inspect
-#	  break
-	end
+        skip_tkspace
+        case name_t2 = get_tk
+        when TkSELF
+          parse_statements(context, SINGLE, &block)
+        when TkCONSTANT
+#          yield RTSingleClass.new(get_tkreaded, context, name_t2.name, tk)
+          parse_statements((context || "") + "::" + name_t2.name, 
+                           SINGLE, 
+                           &block)
+        else
+          printf "Warn: I don't recognize this token(%s)", name_t2.inspect
+#          break
+        end
       else
-	printf "Warn: I don't recognize this token(%s)", name_t2.inspect
-#	break
+        printf "Warn: I don't recognize this token(%s)", name_t2.inspect
+#        break
       end
     end
 
@@ -299,79 +336,84 @@ module RTAGS
       back_tk = skip_tkspace
 
       if (dot = get_tk).kind_of?(TkDOT)
-	# tricky tech.
-	@scanner.instance_eval{@lex_state = EXPR_FNAME}
-	skip_tkspace
-	name_t2 = get_tk
-	case name_t
-	when TkSELF
-	  name = name_t2.name
-	when TkId
-	  if context and 
-	      context =~ /^#{name_t.name}$/ || context =~ /::#{name_t.name}$/
-	    name = name_t2.name
-	  else
-	    context = (context || "") + "::" + name_t.name
-	    name = name_t2.name
-	  end
-	else
-	  printf "Warn: I don't recognize this token(%s).", name_t2.inspect
-	  break
-	end
-	yield RTSingleMethod.new(get_tkreaded, context, name, tk)
+        # tricky tech.
+        @scanner.instance_eval{@lex_state = EXPR_FNAME}
+        skip_tkspace
+        name_t2 = get_tk
+        case name_t
+        when TkSELF
+          name = name_t2.name
+        when TkId
+          if context and 
+              context =~ /^#{name_t.name}$/ || context =~ /::#{name_t.name}$/
+            name = name_t2.name
+          else
+            context = (context || "") + "::" + name_t.name
+            name = name_t2.name
+          end
+        else
+          printf "Warn: I don't recognize this token(%s).", name_t2.inspect
+          break
+        end
+        yield RTSingleMethod.new(get_tkreaded, context, name, tk)
 
       else
-	unget_tk dot
-	back_tk.reverse_each do
-	  |tk|
-	  unget_tk tk
-	end
-	name = name_t.name
-	if single == SINGLE
-	  yield RTSingleMethod.new(get_tkreaded, context, name, tk)
-	else
-	  yield RTMethod.new(get_tkreaded, context, name, tk)
-	end
+        unget_tk dot
+        back_tk.reverse_each do
+          |tk|
+          unget_tk tk
+        end
+        name = name_t.name
+        if single == SINGLE
+          yield RTSingleMethod.new(get_tkreaded, context, name, tk)
+        else
+          yield RTMethod.new(get_tkreaded, context, name, tk)
+        end
       end
     end
+
+# attr ::Bio::PDB::Residue#residue_id in #<RubyToken::TkIDENTIFIER:0x30078790 @char_no=6, @seek=2144, @line_no=79, @name="attr_reader">
+# #<RubyToken::TkIDENTIFIER:0x30074908 @char_no=12, @seek=2234, @line_no=82, @name="id">
+# Exception `NoMethodError' at /home/wrk/izip/svn/opensource/rtags/bin/rtags:341 - undefined method `name' for #<RubyToken::TkSPACE:0x30074638>
+# /home/wrk/izip/svn/opensource/rtags/bin/rtags:341:in `parse_alias': undefined method `name' for #<RubyToken::TkSPACE:0x30074638> (NoMethodError)
 
     def parse_alias(context, single, tk, &block)
       skip_tkspace
       name = get_tk.name
       if context
-	if single == SINGLE
-	  yield RTSingleAlias.new(get_tkreaded, context, name, tk)
-	else
-	  yield RTAlias.new(get_tkreaded, context, name, tk)
-	end
+        if single == SINGLE
+          yield RTSingleAlias.new(get_tkreaded, context, name, tk)
+        else
+          yield RTAlias.new(get_tkreaded, context, name, tk)
+        end
       else
-	if single == SINGLE
-	  yield RTSingleAlias.new(get_tkreaded, "main", name, tk)
-	else
-	  yield RTAlias.new(get_tkreaded, nil, name, tk)
-	end
+        if single == SINGLE
+          yield RTSingleAlias.new(get_tkreaded, "main", name, tk)
+        else
+          yield RTAlias.new(get_tkreaded, nil, name, tk)
+        end
       end
     end
 
     def parse_attr(context, single, tk, &block)
       args = parse_symbol_arg(1)
       if args.size > 0
-	name = args[0]
-	if context
-	  if single == SINGLE
-	    yield RTSingleAttr.new(get_tkreaded, context, name, tk)
-	  else
-	    yield RTAttr.new(get_tkreaded, context, name, tk)
-	  end
-	else
-	  if single == SINGLE
-	    yield RTSingleAttr.new(get_tkreaded, "main", name, tk)
-	  else
-	    yield RTAttr.new(get_tkreaded, nil, name, tk)
-	  end
-	end
+        name = args[0]
+        if context
+          if single == SINGLE
+            yield RTSingleAttr.new(get_tkreaded, context, name, tk)
+          else
+            yield RTAttr.new(get_tkreaded, context, name, tk)
+          end
+        else
+          if single == SINGLE
+            yield RTSingleAttr.new(get_tkreaded, "main", name, tk)
+          else
+            yield RTAttr.new(get_tkreaded, nil, name, tk)
+          end
+        end
       else
-	printf "Warn: I don't recognize a token next attr arg size == zero\n"
+        printf "Warn: I don't recognize a token next attr arg size == zero\n"
       end    
     end
 
@@ -379,19 +421,19 @@ module RTAGS
       args = parse_symbol_arg
       readed = get_tkreaded
       for name in args
-	if context
-	  if single == SINGLE
-	    yield RTSingleAttr.new(readed, context, name, tk)
-	  else
-	    yield RTAttr.new(readed, context, name, tk)
-	  end
-	else
-	  if single == SINGLE
-	    yield RTSingleAttr.new(readed, "main", name, tk)
-	  else
-	    yield RTAttr.new(readed, nil, name, tk)
-	  end
-	end
+        if context
+          if single == SINGLE
+            yield RTSingleAttr.new(readed, context, name, tk)
+          else
+            yield RTAttr.new(readed, context, name, tk)
+          end
+        else
+          if single == SINGLE
+            yield RTSingleAttr.new(readed, "main", name, tk)
+          else
+            yield RTAttr.new(readed, nil, name, tk)
+          end
+        end
       end    
     end
 
@@ -400,47 +442,47 @@ module RTAGS
       skip_tkspace
       case tk = get_tk
       when TkLPAREN
-	loop do
-	  skip_tkspace
-	  if tk1 = parse_symbol_in_arg
-	    args.push tk1
-	    break if no and args.size >= no
-	  end
+        loop do
+          skip_tkspace
+          if tk1 = parse_symbol_in_arg
+            args.push tk1
+            break if no and args.size >= no
+          end
 
-	  skip_tkspace
-	  case tk2 = get_tk
-	  when TkRPAREN
-	    break
-	  when TkCOMMA
-	  else
-	    printf "Warn: I don't recognize a token in funargs(%s)\n", tk.inspect
-	    break
-	  end
-	end
+          skip_tkspace
+          case tk2 = get_tk
+          when TkRPAREN
+            break
+          when TkCOMMA
+          else
+            printf "Warn: I don't recognize a token in funargs(%s)\n", tk.inspect
+            break
+          end
+        end
       else
-	unget_tk tk
-	if tk = parse_symbol_in_arg
-	  args.push tk
-	  return args if no and args.size >= no
-	end
+        unget_tk tk
+        if tk = parse_symbol_in_arg
+          args.push tk
+          return args if no and args.size >= no
+        end
 
-	loop do
-	  skip_tkspace(false)
-	  case tk1 = get_tk
-	  when TkCOMMA
-	  when TkNL
-	    unget_tk tk1
-	    break
-	  else
-	    printf "Warn: I don't recognize a token in funargs(%s)\n", tk1.inspect
-	    break
-	  end
-	  skip_tkspace
-	  if tk = parse_symbol_in_arg
-	    args.push tk
-	    break if no and args.size >= no
-	  end
-	end
+        loop do
+          skip_tkspace(false)
+          case tk1 = get_tk
+          when TkCOMMA
+          when TkNL
+            unget_tk tk1
+            break
+          else
+            printf "Warn: I don't recognize a token in funargs(%s)\n", tk1.inspect
+            break
+          end
+          skip_tkspace
+          if tk = parse_symbol_in_arg
+            args.push tk
+            break if no and args.size >= no
+          end
+        end
       end
       args
     end
@@ -448,20 +490,20 @@ module RTAGS
     def parse_symbol_in_arg
       case tk = get_tk
       when TkSYMBEG
-	case tk = get_tk
-	when TkCONSTANT, 
-	    TkIDENTIFIER,
-	    TkFID
-	  tk.name
-	else
-	  printf "Warn: I don't recognize a token next SYMBEG(%s)\n", tk.inspect
-	  nil
-	end
+        case tk = get_tk
+        when TkCONSTANT, 
+            TkIDENTIFIER,
+            TkFID
+          tk.name
+        else
+          printf "Warn: I don't recognize a token next SYMBEG(%s)\n", tk.inspect
+          nil
+        end
       when TkSTRING
-	eval @readed[-1]
+        eval @readed[-1]
       else
-	printf "Warn: I don't recognize a token not SYMBEG and STRING(%s)\n", tk.inspect if $DEBUG
-	nil
+        $stderr.printf "Warn: I don't recognize a token not SYMBEG and STRING(%s)\n", tk.inspect if $options.debug
+        nil
       end
     end
   end
@@ -474,29 +516,29 @@ module RTAGS
 
   class EMACS_TAGS < TAGS
     def shipout
-      open("TAGS", "w") do
-	|@output|
+      open($options.tagfile, "w") do
+        |@output|
 
-	for fn in @files
-	  output = []
-	  size = 0
+        for fn in @files
+          output = []
+          size = 0
 
-	  printf "--\n-- parse file: %s\n", fn if $DEBUG
-	  parser = Parser.new(fn)
-	  parser.scan do
-	    |tk|
-	    print tk, "\n" if $DEBUG
-	    item = sprintf("%s\C-?%s\C-A%d,%s\n",
-			   tk.readed,
-			   tk.abs_name,
-			   tk.line_no,
-			   tk.seek)
-	    output.push item
-	    size += item.size
-	  end
-	  @output.print "\C-L\n#{fn},#{size}\n"
-	  @output.print output.join
-	end
+          $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
+          parser = Parser.new(fn)
+          parser.scan do
+            |tk|
+            $stderr.print tk, "\n" if $options.debug
+            item = sprintf("%s\C-?%s\C-A%d,%s\n",
+                           tk.readed,
+                           tk.abs_name,
+                           tk.line_no,
+                           tk.seek)
+            output.push item
+            size += item.size
+          end
+          @output.print "\C-L\n#{fn},#{size}\n"
+          @output.print output.join
+        end
       end
     end
   end
@@ -505,38 +547,37 @@ module RTAGS
     def shipout
       output = []
       for fn in @files
-	printf "--\n-- parse file: %s\n", fn if $DEBUG
-	parser = Parser.new(fn) 
-	parser.scan do
-	  |tk|
-	  print tk, "\n" if $DEBUG
-	  output.push sprintf("%s\t%s\t/^%s/\n",
-				tk.name,
-				fn,
-				tk.readed)
-	  output.push sprintf("%s\t%s\t/^%s/\n",
-				tk.abs_name,
-				fn,
-				tk.readed)
-	
-	end
+        $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
+        parser = Parser.new(fn) 
+        parser.scan do
+          |tk|
+          $stderr.print tk, "\n" if $options.debug
+          output.push sprintf("%s\t%s\t/^%s/\n",
+                                tk.name,
+                                fn,
+                                tk.readed)
+          output.push sprintf("%s\t%s\t/^%s/\n",
+                                tk.abs_name,
+                                fn,
+                                tk.readed)
+        
+        end
       end
-      open("tags", "w") do
-	|out|
-	out << output.sort!
+      open($options.tagfile, "w") do
+        |out|
+        out << output.sort!
       end
     end
   end
 end
 
 if ARGV.size == 0 or ARGV[0] == '--help'
-	ARGV.shift
-	print usage
-	exit 1
+        ARGV.shift
+        print usage
+        exit 1
 end
 
-if /--?vi/ =~ ARGV[0]
-  ARGV.shift
+if $options.vi
   tags = RTAGS::VI_TAGS.new(ARGV)
 else
   tags = RTAGS::EMACS_TAGS.new(ARGV)

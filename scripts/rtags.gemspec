@@ -2,7 +2,7 @@ require 'rubygems'
 
 spec = Gem::Specification.new do |s|
 	s.name = 'rtags'
-	s.version = "0.91"
+	s.version = "0.92"
 	s.platform = Gem::Platform::RUBY
 	s.summary = "rtags is a Ruby replacement for ctags - allowing for name navigation in source code using vim, emacs and others"
 	s.description = "This is the original commit of the rtags source code as written by Keiju ISHITSUKA as part of the irb project. Now irb has moved into the main Ruby source tree rtags has become an independent project" 

@@ -1,0 +1,17 @@
+rtags.rb - 
+ 
+Release Version: 0.92 (August 2006) by Pjotr Prins
+	Added catching of parse errors
+	Added support for command line arguments with optparse
+	Added debug switches
+	Print to stderr on debug
+
+Release Version: 0.91 (July 2006) by Pjotr Prins
+  First independent public release on RubyForge
+  Depends on irb 0.9
+	Wrote install.sh and gem packaging
+           
+Release Version: 0.9 (2002/07/09) by Keiju ISHITSUKA
+  Released as part of irb source tree
+
+
