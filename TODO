@@ -1,2 +1,3 @@
-- Create unit tests
-- Provide more command line switches
+- Recognise 'aliase :name' tokens
+- Create regression/unit tests
+- Provide more command line switches (especially -R)

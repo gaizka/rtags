@@ -24,6 +24,7 @@ usage = <<USAGE
         usage:
 
                 rtags [--vi] filenames
+								rtags --help
 
         by default creates an emacs tags file. With the --vi switch
         a vim tags file is created instead.
@@ -46,11 +47,14 @@ EXAMPLE
     exit()
   }
    
-  opts.on("-f tagfile", String, "Output to tagfile (default 'TAGS')") do
+  opts.on("-f tagfile", String, "Output to tagfile (default 'TAGS')") do | s |
     $options.tagfile = s
   end
   opts.on("--vi", "Use vi type tags (default is emacs)") do 
     $options.vi = true
+  end
+  opts.on("--quiet", "Quiet mode") do 
+    $options.quiet = true
   end
   opts.on("--debug", "Debug output to stdout") do 
     $options.debug = true
@@ -69,7 +73,7 @@ if $options.tagfile == nil
 	end
 end
 
-$stderr.print "Writing to file #{$options.tagfile}\n" if $options.debug
+print "\nrtags.rb #{RTAGS_VERSION} writing to file '#{$options.tagfile}'\n" if !$options.quiet
 
 require "e2mmap"
 require "tracer"
@@ -189,8 +193,8 @@ module RTAGS
     end
 
     def scan(&block)
-      File.open(@input_file_name) do
-        |input|
+			print "\nParsing #{@input_file_name}..." if !$options.quiet
+      File.open(@input_file_name) do |input|
         @tokens = []
         @unget_readed = []
         @readed = []
@@ -203,12 +207,12 @@ module RTAGS
       if @tokens.empty?
         tk = @scanner.token
         @readed.push @scanner.get_readed
-        $stderr.p tk if $options.debug_tokens
+        $stderr.print tk.inspect if $options.debug_tokens
         tk
       else
         @readed.push @unget_readed.shift
         tk = @tokens.shift
-        $stderr.p tk if $options.debug_tokens
+        $stderr.print tk.inspect if $options.debug_tokens
         tk
       end
     end
@@ -282,12 +286,12 @@ module RTAGS
         	end while peek_tk == TkNL
       	end
 			rescue
-        print "\n\nFATAL: Parse error\n"
-				print "context="
-				p context
-				print "\nblock="
-				p &block
-				raise $!
+        $stderr.print "\nWarn: parse error in <#{@input_file_name}>"
+				$stderr.print "in line #{tk.line_no}, pos #{tk.char_no} by name <#{tk.name}>\n" if tk!=nil
+				$stderr.print "context=",context if $options.debug
+				$stderr.print "Token=",tk.inspect,"\n"
+				$stderr.print $! if $options.debug
+				# raise $!
 			end
     end
 
@@ -314,11 +318,11 @@ module RTAGS
                            SINGLE, 
                            &block)
         else
-          printf "Warn: I don't recognize this token(%s)", name_t2.inspect
+          $stderr.printf "Warn: I don't recognize this token(%s)", name_t2.inspect
 #          break
         end
       else
-        printf "Warn: I don't recognize this token(%s)", name_t2.inspect
+        $stderr.printf "Warn: I don't recognize this token(%s)", name_t2.inspect
 #        break
       end
     end
@@ -352,7 +356,7 @@ module RTAGS
             name = name_t2.name
           end
         else
-          printf "Warn: I don't recognize this token(%s).", name_t2.inspect
+          $stderr.printf "Warn: I don't recognize this token(%s).", name_t2.inspect
           break
         end
         yield RTSingleMethod.new(get_tkreaded, context, name, tk)
@@ -371,11 +375,6 @@ module RTAGS
         end
       end
     end
-
-# attr ::Bio::PDB::Residue#residue_id in #<RubyToken::TkIDENTIFIER:0x30078790 @char_no=6, @seek=2144, @line_no=79, @name="attr_reader">
-# #<RubyToken::TkIDENTIFIER:0x30074908 @char_no=12, @seek=2234, @line_no=82, @name="id">
-# Exception `NoMethodError' at /home/wrk/izip/svn/opensource/rtags/bin/rtags:341 - undefined method `name' for #<RubyToken::TkSPACE:0x30074638>
-# /home/wrk/izip/svn/opensource/rtags/bin/rtags:341:in `parse_alias': undefined method `name' for #<RubyToken::TkSPACE:0x30074638> (NoMethodError)
 
     def parse_alias(context, single, tk, &block)
       skip_tkspace
@@ -413,7 +412,7 @@ module RTAGS
           end
         end
       else
-        printf "Warn: I don't recognize a token next attr arg size == zero\n"
+        $stderr.printf "Warn: I don't recognize a token next attr arg size == zero\n"
       end    
     end
 
@@ -455,7 +454,7 @@ module RTAGS
             break
           when TkCOMMA
           else
-            printf "Warn: I don't recognize a token in funargs(%s)\n", tk.inspect
+            $stderr.printf "Warn: I don't recognize a token in funargs(%s)\n", tk.inspect
             break
           end
         end
@@ -474,7 +473,7 @@ module RTAGS
             unget_tk tk1
             break
           else
-            printf "Warn: I don't recognize a token in funargs(%s)\n", tk1.inspect
+            $stderr.printf "Warn: I don't recognize a token in funargs(%s)\n", tk1.inspect
             break
           end
           skip_tkspace
@@ -496,7 +495,7 @@ module RTAGS
             TkFID
           tk.name
         else
-          printf "Warn: I don't recognize a token next SYMBEG(%s)\n", tk.inspect
+          $stderr.printf "Warn: I don't recognize a token next SYMBEG(%s)\n", tk.inspect
           nil
         end
       when TkSTRING

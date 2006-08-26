@@ -1,0 +1,46 @@
+
+data/fileops.rb,2675
+module Cfruby::Cfruby17,476
+	module FileOps::Cfruby::FileOps19,493
+		class FileOpsError::Cfruby::FileOps::FileOpsError25,659
+		class FileOpsUnknownProtocolError::Cfruby::FileOps::FileOpsUnknownProtocolError29,782
+		class FileOpsFileExistError::Cfruby::FileOps::FileOpsFileExistError33,911
+		class FileOpsOverwriteError::Cfruby::FileOps::FileOpsOverwriteError37,1038
+		class FileOpsWrongFiletypeError::Cfruby::FileOps::FileOpsWrongFiletypeError41,1155
+		class FileOps::Cfruby::FileOps::FileOps47,1363
+			def move::Cfruby::FileOps::FileOps#move54,1705
+			def copy::Cfruby::FileOps::FileOps#copy62,2057
+		class FileOps::Cfruby::FileOps::FileOps69,2182
+			def move::Cfruby::FileOps::FileOps#move76,2522
+			def copy::Cfruby::FileOps::FileOps#copy125,4285
+			def copy_single::Cfruby::FileOps::FileOps#copy_single162,5676
+		class FileOps::Cfruby::FileOps::FileOps218,7308
+			def move::Cfruby::FileOps::FileOps#move225,7575
+			def copy::Cfruby::FileOps::FileOps#copy233,7807
+		class FileOps::Cfruby::FileOps::FileOps257,8316
+			def move::Cfruby::FileOps::FileOps#move259,8351
+			def copy::Cfruby::FileOps::FileOps#copy266,8569
+		def FileOps.get_protocol::Cfruby::FileOps.get_protocol289,9221
+		def FileOps.move::Cfruby::FileOps.move318,9965
+		def FileOps.copy::Cfruby::FileOps.copy326,10320
+		def FileOps.touch::Cfruby::FileOps.touch333,10592
+		def FileOps.unlink::Cfruby::FileOps.unlink352,11088
+		def FileOps.mkdir::Cfruby::FileOps.mkdir364,11508
+		def FileOps.rmdir::Cfruby::FileOps.rmdir397,12332
+		def FileOps.link::Cfruby::FileOps.link433,13425
+		def FileOps.create::Cfruby::FileOps.create464,14569
+		def FileOps.flock::Cfruby::FileOps.flock502,15772
+		def FileOps.set_backup::Cfruby::FileOps.set_backup528,16426
+		def FileOps.backup::Cfruby::FileOps.backup537,16871
+		def FileOps.delete_nonalpha::Cfruby::FileOps.delete_nonalpha609,19229
+		def FileOps.delete::Cfruby::FileOps.delete624,19779
+		def FileOps.chown_mod::Cfruby::FileOps.chown_mod648,20595
+		def FileOps.disable::Cfruby::FileOps.disable675,21448
+		def FileOps.chown::Cfruby::FileOps.chown690,21857
+		def FileOps.chmod::Cfruby::FileOps.chmod717,22812
+		module FileOps::Cfruby::FileOps::FileOps752,24011
+			def SymlinkHandler.stat::Cfruby::FileOps::FileOps::SymlinkHandler.stat756,24173
+			def SymlinkHandler.unlink::Cfruby::FileOps::FileOps::SymlinkHandler.unlink771,24583
+			def SymlinkHandler.broken?::Cfruby::FileOps::FileOps::SymlinkHandler.broken?784,24881
+			def SymlinkHandler.points_to?::Cfruby::FileOps::FileOps::SymlinkHandler.points_to?815,25766
+		def FileOps.strip_protocol::Cfruby::FileOps.strip_protocol835,26188

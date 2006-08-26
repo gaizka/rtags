@@ -2,9 +2,13 @@ rtags.rb -
  
 Release Version: 0.92 (August 2006) by Pjotr Prins
 	Added catching of parse errors
+	Fixed exit on 'alias' token error (`parse_alias': undefined method `name')
 	Added support for command line arguments with optparse
-	Added debug switches
+	Added debug switches (--debug, --debug_tokens)
 	Print to stderr on debug
+	Added support for alternate tags filename (-f switch)
+	Added --quiet switch
+	Added regression files to ./test
 
 Release Version: 0.91 (July 2006) by Pjotr Prins
   First independent public release on RubyForge
