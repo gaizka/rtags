@@ -208,11 +208,17 @@ module RTAGS
 
 		def warn s,level=0,token=nil,extra=nil
 			if level <= $options.warning_level
-	      $stderr.print "\nWarn: #{s} in <#{@input_file_name}>"
-  	    $stderr.print "in line #{token.line_no}, pos #{token.char_no} by name <#{token.name}>\n" if token!=nil
-    	  $stderr.print "context=",context if $options.debug
-      	$stderr.print "Token=",token.inspect,"\n" if token!=nil
-      	$stderr.print extra if extra
+	      $stderr.print "\nWarn: #{s} in <#{@input_file_name}> "
+				if token
+	  	    $stderr.print "in line #{token.line_no}, pos #{token.char_no}"
+					# $stderr.print "by name <#{token.name}>" if token and token.name
+					$stderr.print "\n"
+				end
+				if $options.debug
+    	  	$stderr.print "context=",context if context
+      		$stderr.print "Token=",token.inspect,"\n" if token
+      		$stderr.print extra if extra
+				end
 			end
 		end
 
@@ -227,6 +233,9 @@ module RTAGS
       end
     end
 
+		# get the next token - fetching it from the temporary +@tokens+
+		# stack if it is not empty
+		
     def get_tk
       if @tokens.empty?
         tk = @scanner.token
@@ -241,11 +250,13 @@ module RTAGS
       end
     end
 
+		# lookahead returning the next token without popping it
     def peek_tk
       unget_tk(tk = get_tk)
       tk
     end
 
+		# push the token +tk+ back onto the stack
     def unget_tk(tk)
       @tokens.unshift tk
       @unget_readed.unshift @readed.pop
@@ -261,6 +272,8 @@ module RTAGS
       tokens
     end
 
+		# returns the actual token string as it was read and 
+		# sets the read buffer to zero length
     def get_tkreaded
       readed = @readed.join("")
       @readed = []
@@ -272,6 +285,7 @@ module RTAGS
 
     def parse_statements(context = nil, single = NORMAL, &block)
       begin
+				last_seekpos = -1
         nest = 1
 
         while tk = get_tk
@@ -306,8 +320,17 @@ module RTAGS
           end
           begin
             get_tkreaded
-            skip_tkspace(false)
+            skip_tkspace(false) # don't skip newlines
+						# prevent endless loop (tokenizer does not always behave
+						# at eof)
+						seekpos = peek_tk.seek
+					  if last_seekpos == seekpos
+							warn('bailing out early',0,tk)
+            	return
+						end
+						last_seekpos = seekpos
           end while peek_tk == TkNL
+					# p [@input_file_name, peek_tk]
         end
       rescue
 				warn('parse error',0,tk,$!)
