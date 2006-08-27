@@ -2,6 +2,14 @@
 
 if [ ! -d test ]; then echo "Run from base directory!" ; exit ; fi
 
+echo -n "Release "
+cat bin/VERSION
+cd test
+ruby runner.rb
+cd ..
+echo "hit enter to continue"
+read 
+
 rm *.gem
 rm *.tgz
 
