@@ -1,0 +1,10 @@
+::That	./data/code01.txt	/^module That/
+::That::Ritz	./data/code01.txt	/^class Ritz/
+::That::Ritz#mymy	./data/code01.txt	/^        def mymy/
+::That::Sothere	./data/code01.txt	/^        class Sothere/
+::That::Sothere#mymy	./data/code01.txt	/^                def mymy/
+Ritz	./data/code01.txt	/^class Ritz/
+Sothere	./data/code01.txt	/^        class Sothere/
+That	./data/code01.txt	/^module That/
+mymy	./data/code01.txt	/^                def mymy/
+mymy	./data/code01.txt	/^        def mymy/

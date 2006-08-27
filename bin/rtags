@@ -9,22 +9,25 @@
 #   INSTALL: see file README
 #   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.92 (August 2006)'
+RTAGS_VERSION='0.93 (August 2006)'
 
 require 'optparse'
 require 'ostruct'
 
 usage = <<USAGE
 
-        rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA:
+        rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA
+				  improvements by Pjotr Prins
         
-        A Ruby tool for using Ruby tags with vim or emacs
+        A Ruby tool for using Ruby tags rendering more tags than
+        other tools for use with vim or emacs
+        
         http://rubyforge.org/projects/rtags/ - maintainer Pjotr Prins
 
         usage:
 
                 rtags [--vi] filenames
-								rtags --help
+                rtags --help
 
         by default creates an emacs tags file. With the --vi switch
         a vim tags file is created instead.
@@ -33,22 +36,31 @@ USAGE
 
 
 $options = OpenStruct.new()
+$options.warning_level = 0
+
 opts = OptionParser.new() { |opts|
   opts.on_tail("-h", "--help", "Print this message") {
-	 	print(usage)
+     print(usage)
     print(opts)
     print <<EXAMPLE
     
 Examples:
 
     rtags *.rb
-		
+    rtags --vi -f vim_tags *.rb
+    
 EXAMPLE
     exit()
   }
    
   opts.on("-f tagfile", String, "Output to tagfile (default 'TAGS')") do | s |
     $options.tagfile = s
+  end
+  opts.on("-a", "append mode") do 
+    $options.tagfile_mode = 'a'
+  end
+  opts.on("-w level", Integer, "Warning level (default 0)") do | w |
+    $options.warning_level = w
   end
   opts.on("--vi", "Use vi type tags (default is emacs)") do 
     $options.vi = true
@@ -66,12 +78,14 @@ EXAMPLE
 opts.parse!(ARGV)
 
 if $options.tagfile == nil
-	if $options.vi
-		$options.tagfile = 'tags' 
-	else
-		$options.tagfile = 'TAGS' 
-	end
+  if $options.vi
+    $options.tagfile = 'tags' 
+  else
+    $options.tagfile = 'TAGS' 
+  end
 end
+$options.tagfile_mode = 'w' if $options.tagfile_mode == nil
+$options.warning_level = -1 if $options.quiet
 
 print "\nrtags.rb #{RTAGS_VERSION} writing to file '#{$options.tagfile}'\n" if !$options.quiet
 
@@ -192,8 +206,18 @@ module RTAGS
       #parse_statements
     end
 
+		def warn s,level=0,token=nil,extra=nil
+			if level <= $options.warning_level
+	      $stderr.print "\nWarn: #{s} in <#{@input_file_name}>"
+  	    $stderr.print "in line #{token.line_no}, pos #{token.char_no} by name <#{token.name}>\n" if token!=nil
+    	  $stderr.print "context=",context if $options.debug
+      	$stderr.print "Token=",token.inspect,"\n" if token!=nil
+      	$stderr.print extra if extra
+			end
+		end
+
     def scan(&block)
-			print "\nParsing #{@input_file_name}..." if !$options.quiet
+      print "\nParsing #{@input_file_name}..." if !$options.quiet
       File.open(@input_file_name) do |input|
         @tokens = []
         @unget_readed = []
@@ -247,52 +271,47 @@ module RTAGS
     SINGLE = "<<"
 
     def parse_statements(context = nil, single = NORMAL, &block)
-			begin
-	      nest = 1
+      begin
+        nest = 1
 
-  	    while tk = get_tk
-    	    case tk
-      	  when TkCLASS
-        	  parse_class(context, single, tk, &block)
-        	when TkMODULE
-          	parse_module(context, single, tk, &block)
-        	when TkDEF
-          	nest += 1
-          	parse_method(context, single, tk, &block)
-        	when TkALIAS
-          	parse_alias(context, single, tk, &block)
-        	when TkCASE,
-          	   TkDO,
-             	 TkFOR,
-            	 TkIF,
-            	 TkUNLESS,
-            	 TkUNTIL,
-           	 	 TkWHILE, 
-            	 TkBEGIN
-          	nest += 1
-	        when TkIDENTIFIER
-           	case tk.name
-           	when "attr"
-            	parse_attr(context, single, tk, &block)
-          	when /^attr_(reader|writer|accessor)$/
-            	parse_attr_accessor(context, single, tk, &block)
-          	end
-        	when TkEND
-          	return if (nest -= 1) == 0
-        	end
-        	begin
-          	get_tkreaded
-          	skip_tkspace(false)
-        	end while peek_tk == TkNL
-      	end
-			rescue
-        $stderr.print "\nWarn: parse error in <#{@input_file_name}>"
-				$stderr.print "in line #{tk.line_no}, pos #{tk.char_no} by name <#{tk.name}>\n" if tk!=nil
-				$stderr.print "context=",context if $options.debug
-				$stderr.print "Token=",tk.inspect,"\n"
-				$stderr.print $! if $options.debug
-				# raise $!
-			end
+        while tk = get_tk
+          case tk
+          when TkCLASS
+            parse_class(context, single, tk, &block)
+          when TkMODULE
+            parse_module(context, single, tk, &block)
+          when TkDEF
+            nest += 1
+            parse_method(context, single, tk, &block)
+          when TkALIAS
+            parse_alias(context, single, tk, &block)
+          when TkCASE,
+               TkDO,
+                TkFOR,
+               TkIF,
+               TkUNLESS,
+               TkUNTIL,
+                 TkWHILE, 
+               TkBEGIN
+            nest += 1
+          when TkIDENTIFIER
+             case tk.name
+             when "attr"
+              parse_attr(context, single, tk, &block)
+            when /^attr_(reader|writer|accessor)$/
+              parse_attr_accessor(context, single, tk, &block)
+            end
+          when TkEND
+            return if (nest -= 1) == 0
+          end
+          begin
+            get_tkreaded
+            skip_tkspace(false)
+          end while peek_tk == TkNL
+        end
+      rescue
+				warn('parse error',0,tk,$!)
+      end
     end
 
     def parse_class(context, single, tk, &block)
@@ -318,12 +337,10 @@ module RTAGS
                            SINGLE, 
                            &block)
         else
-          $stderr.printf "Warn: I don't recognize this token(%s)", name_t2.inspect
-#          break
+					warn('unrecognised token',1,name_t2)
         end
       else
-        $stderr.printf "Warn: I don't recognize this token(%s)", name_t2.inspect
-#        break
+				warn('unrecognised token',1,name_t2)
       end
     end
 
@@ -356,7 +373,7 @@ module RTAGS
             name = name_t2.name
           end
         else
-          $stderr.printf "Warn: I don't recognize this token(%s).", name_t2.inspect
+					warn('unrecognised token',1,name_t2)
           break
         end
         yield RTSingleMethod.new(get_tkreaded, context, name, tk)
@@ -412,7 +429,7 @@ module RTAGS
           end
         end
       else
-        $stderr.printf "Warn: I don't recognize a token next attr arg size == zero\n"
+				warn('token not recognized - next attr arg size == zero',1)
       end    
     end
 
@@ -454,7 +471,7 @@ module RTAGS
             break
           when TkCOMMA
           else
-            $stderr.printf "Warn: I don't recognize a token in funargs(%s)\n", tk.inspect
+					  warn('token not recognized in funargs',1,tk)
             break
           end
         end
@@ -473,7 +490,7 @@ module RTAGS
             unget_tk tk1
             break
           else
-            $stderr.printf "Warn: I don't recognize a token in funargs(%s)\n", tk1.inspect
+					  warn('token not recognized in funargs',1,tk1)
             break
           end
           skip_tkspace
@@ -495,13 +512,13 @@ module RTAGS
             TkFID
           tk.name
         else
-          $stderr.printf "Warn: I don't recognize a token next SYMBEG(%s)\n", tk.inspect
+					warn('token not recognized; next SYMBEG ',1,tk)
           nil
         end
       when TkSTRING
         eval @readed[-1]
       else
-        $stderr.printf "Warn: I don't recognize a token not SYMBEG and STRING(%s)\n", tk.inspect if $options.debug
+				warn('token not recognized; next SYMBEG and STRING ',1,tk) if $options.debug 
         nil
       end
     end
@@ -515,7 +532,7 @@ module RTAGS
 
   class EMACS_TAGS < TAGS
     def shipout
-      open($options.tagfile, "w") do
+      open($options.tagfile, $options.tagfile_mode) do
         |@output|
 
         for fn in @files
@@ -562,7 +579,7 @@ module RTAGS
         
         end
       end
-      open($options.tagfile, "w") do
+      open($options.tagfile, $options.tagfile_mode) do
         |out|
         out << output.sort!
       end

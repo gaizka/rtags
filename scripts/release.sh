@@ -2,6 +2,9 @@
 
 if [ ! -d test ]; then echo "Run from base directory!" ; exit ; fi
 
+rm *.gem
+rm *.tgz
+
 ruby ./scripts/rtags.gemspec
 
 version=`cat ./bin/VERSION`

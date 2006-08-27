@@ -1,5 +1,11 @@
 rtags.rb - 
- 
+
+Release Version: 0.93 (August 2006) by Pjotr Prins
+	Added -a switch (append mode)
+	Turned warnings off by default (-w switch)
+	Included RELEASENOTES in gem
+	More regression testing (-a, tags, TAGS)
+
 Release Version: 0.92 (August 2006) by Pjotr Prins
 	Added catching of parse errors
 	Fixed exit on 'alias' token error (`parse_alias': undefined method `name')

@@ -1,5 +1,5 @@
 
-data/report.rb,3740
+./data/report.rb,3740
 module Bio::Bio4,126
 class HMMER::Bio::HMMER6,138
   def self.reports::Bio::HMMER.reports21,433
