@@ -554,9 +554,9 @@ module RTAGS
   end
 
   class EMACS_TAGS < TAGS
+		# Create the tags file in emacs mode
     def shipout
-      open($options.tagfile, $options.tagfile_mode) do
-        |@output|
+      open($options.tagfile, $options.tagfile_mode) do |@output|
 
         for fn in @files
           output = []
@@ -564,11 +564,11 @@ module RTAGS
 
           $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
           parser = Parser.new(fn)
-          parser.scan do
-            |tk|
+          parser.scan do |tk|
             $stderr.print tk, "\n" if $options.debug
+						line = tk.readed.split(/\n/)[0]
             item = sprintf("%s\C-?%s\C-A%d,%s\n",
-                           tk.readed,
+                           line,
                            tk.abs_name,
                            tk.line_no,
                            tk.seek)
@@ -583,27 +583,28 @@ module RTAGS
   end
 
   class VI_TAGS < TAGS
+		# Create the tags file in vi(m) mode
     def shipout
       output = []
       for fn in @files
         $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
         parser = Parser.new(fn) 
-        parser.scan do
-          |tk|
+        parser.scan do |tk|
           $stderr.print tk, "\n" if $options.debug
+					line = tk.readed.split(/\n/)[0]
           output.push sprintf("%s\t%s\t/^%s/\n",
                                 tk.name,
                                 fn,
-                                tk.readed)
+                                line)
           output.push sprintf("%s\t%s\t/^%s/\n",
                                 tk.abs_name,
                                 fn,
-                                tk.readed)
+                                line)
         
         end
       end
-      open($options.tagfile, $options.tagfile_mode) do
-        |out|
+			# sort entries
+      open($options.tagfile, $options.tagfile_mode) do |out|
         out << output.sort!
       end
     end
@@ -622,5 +623,3 @@ else
   tags = RTAGS::EMACS_TAGS.new(ARGV)
 end
 tags.shipout
-
-
