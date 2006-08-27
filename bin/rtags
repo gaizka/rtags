@@ -215,7 +215,6 @@ module RTAGS
 					$stderr.print "\n"
 				end
 				if $options.debug
-    	  	$stderr.print "context=",context if context
       		$stderr.print "Token=",token.inspect,"\n" if token
       		$stderr.print extra if extra
 				end
@@ -323,7 +322,8 @@ module RTAGS
             skip_tkspace(false) # don't skip newlines
 						# prevent endless loop (tokenizer does not always behave
 						# at eof)
-						seekpos = peek_tk.seek
+						tmp_tk = tk
+						seekpos = tmp_tk.seek if tmp_tk and tmp_tk.seek
 					  if last_seekpos == seekpos
 							warn('bailing out early',0,tk)
             	return
