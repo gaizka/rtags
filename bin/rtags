@@ -48,6 +48,7 @@ Examples:
 
     rtags *.rb
     rtags --vi -f vim_tags *.rb
+		rtags `find ~/src/ -name *.rb|grep -v _darcs`
     
 EXAMPLE
     exit()
