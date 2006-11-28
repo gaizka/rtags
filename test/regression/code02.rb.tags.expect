@@ -1,22 +1,22 @@
 ::Hit	./data/code02.rb	/^      class Hit/
+::Hit#Hit.new	./data/code02.rb	/^        def initialize/
 ::Hit#accession	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#definition	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#each	./data/code02.rb	/^        def each/
 ::Hit#hit_id	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#hsps	./data/code02.rb	/^        attr_reader :hsps/
-::Hit#initialize	./data/code02.rb	/^        def initialize/
 ::Hit#len	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#num	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#query_def	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#query_id	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 ::Hit#query_len	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 Hit	./data/code02.rb	/^      class Hit/
+Hit.new	./data/code02.rb	/^        def initialize/
 accession	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 definition	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 each	./data/code02.rb	/^        def each/
 hit_id	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 hsps	./data/code02.rb	/^        attr_reader :hsps/
-initialize	./data/code02.rb	/^        def initialize/
 len	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 num	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/
 query_def	./data/code02.rb	/^        attr_accessor :query_id, :query_def, :query_len,/

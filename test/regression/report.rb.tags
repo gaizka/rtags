@@ -10,6 +10,7 @@
 ::Bio::HMMER#target_def	./data/report.rb	/^      def target_def/
 ::Bio::HMMER.reports	./data/report.rb	/^  def self.reports/
 ::Bio::HMMER::Hit	./data/report.rb	/^    class Hit/
+::Bio::HMMER::Hit#Bio::HMMER::Hit.new	./data/report.rb	/^      def initialize/
 ::Bio::HMMER::Hit#accession	./data/report.rb	/^      attr_reader :accession/
 ::Bio::HMMER::Hit#bit_score	./data/report.rb	/^      alias bit_score/
 ::Bio::HMMER::Hit#definition	./data/report.rb	/^      alias definition/
@@ -19,17 +20,16 @@
 ::Bio::HMMER::Hit#evalue	./data/report.rb	/^      attr_reader :evalue/
 ::Bio::HMMER::Hit#hit_id	./data/report.rb	/^      alias hit_id/
 ::Bio::HMMER::Hit#hsps	./data/report.rb	/^      attr_reader :hsps/
-::Bio::HMMER::Hit#initialize	./data/report.rb	/^      def initialize/
 ::Bio::HMMER::Hit#num	./data/report.rb	/^      attr_reader :num/
 ::Bio::HMMER::Hit#score	./data/report.rb	/^      attr_reader :score/
 ::Bio::HMMER::Hit#target_id	./data/report.rb	/^      alias target_id/
 ::Bio::HMMER::Report	./data/report.rb	/^  class Report/
+::Bio::HMMER::Report#Bio::HMMER::Report.new	./data/report.rb	/^    def initialize/
 ::Bio::HMMER::Report#domain_top_hits	./data/report.rb	/^    attr_reader :domain_top_hits/
 ::Bio::HMMER::Report#each	./data/report.rb	/^    def each/
 ::Bio::HMMER::Report#histogram	./data/report.rb	/^    attr_reader :histogram/
 ::Bio::HMMER::Report#hits	./data/report.rb	/^    attr_reader :hits/
 ::Bio::HMMER::Report#hsps	./data/report.rb	/^    attr_reader :hsps/
-::Bio::HMMER::Report#initialize	./data/report.rb	/^    def initialize/
 ::Bio::HMMER::Report#parameter	./data/report.rb	/^    attr_reader :parameter/
 ::Bio::HMMER::Report#program	./data/report.rb	/^    attr_reader :program/
 ::Bio::HMMER::Report#query_info	./data/report.rb	/^    attr_reader :query_info/
@@ -37,6 +37,7 @@
 ::Bio::HMMER::Report#total_seq_searched	./data/report.rb	/^    attr_reader :total_seq_searched/
 ::Bio::HMMER::Report#whole_seq_top_hits	./data/report.rb	/^    attr_reader :whole_seq_top_hits/
 ::Bio::Hsp	./data/report.rb	/^    class Hsp/
+::Bio::Hsp#Bio::Hsp.new	./data/report.rb	/^      def initialize/
 ::Bio::Hsp#accession	./data/report.rb	/^      attr_reader :accession/
 ::Bio::Hsp#bit_score	./data/report.rb	/^      alias bit_score/
 ::Bio::Hsp#csline	./data/report.rb	/^      attr_reader :csline/
@@ -47,7 +48,6 @@
 ::Bio::Hsp#hmm_ft	./data/report.rb	/^      attr_reader :hmm_ft/
 ::Bio::Hsp#hmm_t	./data/report.rb	/^      attr_reader :hmm_t/
 ::Bio::Hsp#hmmseq	./data/report.rb	/^      attr_reader :hmmseq/
-::Bio::Hsp#initialize	./data/report.rb	/^      def initialize/
 ::Bio::Hsp#midline	./data/report.rb	/^      attr_reader :midline/
 ::Bio::Hsp#query_frame	./data/report.rb	/^      attr_reader :query_frame/
 ::Bio::Hsp#query_from	./data/report.rb	/^      def query_from/
@@ -65,6 +65,9 @@
 ::Bio::Hsp#target_seq	./data/report.rb	/^      def target_seq/
 ::Bio::Hsp#target_to	./data/report.rb	/^      def target_to/
 Bio	./data/report.rb	/^module Bio/
+Bio::HMMER::Hit.new	./data/report.rb	/^      def initialize/
+Bio::HMMER::Report.new	./data/report.rb	/^    def initialize/
+Bio::Hsp.new	./data/report.rb	/^      def initialize/
 HMMER	./data/report.rb	/^class HMMER/
 Hit	./data/report.rb	/^    class Hit/
 Hsp	./data/report.rb	/^    class Hsp/
@@ -95,9 +98,6 @@ hmm_t	./data/report.rb	/^      attr_reader :hmm_t/
 hmmseq	./data/report.rb	/^      attr_reader :hmmseq/
 hsps	./data/report.rb	/^      attr_reader :hsps/
 hsps	./data/report.rb	/^    attr_reader :hsps/
-initialize	./data/report.rb	/^      def initialize/
-initialize	./data/report.rb	/^      def initialize/
-initialize	./data/report.rb	/^    def initialize/
 midline	./data/report.rb	/^      attr_reader :midline/
 num	./data/report.rb	/^      attr_reader :num/
 parameter	./data/report.rb	/^    attr_reader :parameter/

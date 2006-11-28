@@ -163,11 +163,13 @@ module RTAGS
       "def"
     end
   end
+	
   class RTAlias < RTMethod
     def def_name
       "alias"
     end
   end
+	
   class RTAttr < RTMethod
     def def_name
       "attr"
@@ -183,11 +185,13 @@ module RTAGS
       "def"
     end
   end
+	
   class RTSingleAlias < RTSingleMethod
     def def_name
       "alias"
     end
   end
+	
   class RTSingleAttr < RTSingleMethod
     def def_name
       "attr"
@@ -207,6 +211,8 @@ module RTAGS
       #parse_statements
     end
 
+		# display warnings on stderr, depending on the set warning_level
+
 		def warn s,level=0,token=nil,extra=nil
 			if level <= $options.warning_level
 	      $stderr.print "\nWarn: #{s} in <#{@input_file_name}> "
@@ -221,6 +227,8 @@ module RTAGS
 				end
 			end
 		end
+
+		# Scan +@input_file_name+ for tags and yields each tag
 
     def scan(&block)
       print "\nParsing #{@input_file_name}..." if !$options.quiet
@@ -251,12 +259,14 @@ module RTAGS
     end
 
 		# lookahead returning the next token without popping it
-    def peek_tk
+
+		def peek_tk
       unget_tk(tk = get_tk)
       tk
     end
 
 		# push the token +tk+ back onto the stack
+
     def unget_tk(tk)
       @tokens.unshift tk
       @unget_readed.unshift @readed.pop
@@ -274,7 +284,8 @@ module RTAGS
 
 		# returns the actual token string as it was read and 
 		# sets the read buffer to zero length
-    def get_tkreaded
+
+		def get_tkreaded
       readed = @readed.join("")
       @readed = []
       readed
@@ -283,6 +294,9 @@ module RTAGS
     NORMAL = "::"
     SINGLE = "<<"
 
+		# The 'grunt' method splits a line into tokens and invokes the
+		# basic parsers for class, module, method etc.
+		
     def parse_statements(context = nil, single = NORMAL, &block)
       begin
 				last_seekpos = -1
@@ -301,11 +315,11 @@ module RTAGS
             parse_alias(context, single, tk, &block)
           when TkCASE,
                TkDO,
-                TkFOR,
+               TkFOR,
                TkIF,
                TkUNLESS,
                TkUNTIL,
-                 TkWHILE, 
+               TkWHILE, 
                TkBEGIN
             nest += 1
           when TkIDENTIFIER
@@ -381,7 +395,8 @@ module RTAGS
       back_tk = skip_tkspace
 
       if (dot = get_tk).kind_of?(TkDOT)
-        # tricky tech.
+        # tricky tech. Not sure when this gets reached - probably 
+				# 'static' definitions as part of modules
         @scanner.instance_eval{@lex_state = EXPR_FNAME}
         skip_tkspace
         name_t2 = get_tk
@@ -409,6 +424,14 @@ module RTAGS
           unget_tk tk
         end
         name = name_t.name
+				# ---- if the method is an initialize make sure the class
+				# initiation (with Class.new) points to the tag
+				if name=='initialize'
+					name = 'new' 
+        	if context and context =~ /::(\S+)$/
+						name = $1+'.new'
+					end
+				end
         if single == SINGLE
           yield RTSingleMethod.new(get_tkreaded, context, name, tk)
         else

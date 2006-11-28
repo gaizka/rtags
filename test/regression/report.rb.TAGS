@@ -1,5 +1,5 @@
 
-./data/report.rb,3740
+./data/report.rb,3763
 module Bio::Bio4,126
 class HMMER::Bio::HMMER6,138
   def self.reports::Bio::HMMER.reports21,433
@@ -14,7 +14,7 @@ class HMMER::Bio::HMMER6,138
     attr_reader :total_seq_searched::Bio::HMMER::Report#total_seq_searched97,2447
     attr_reader :whole_seq_top_hits::Bio::HMMER::Report#whole_seq_top_hits100,2585
     attr_reader :domain_top_hits::Bio::HMMER::Report#domain_top_hits103,2723
-    def initialize::Bio::HMMER::Report#initialize115,3074
+    def initialize::Bio::HMMER::Report#Bio::HMMER::Report.new115,3074
     def each::Bio::HMMER::Report#each165,4637
     def get_subdata::Bio::HMMER#get_subdata174,4769
     def parse_header_data::Bio::HMMER#parse_header_data219,6368
@@ -34,7 +34,7 @@ class HMMER::Bio::HMMER6,138
       alias bit_score::Bio::HMMER::Hit#bit_score341,9425
       attr_reader :evalue::Bio::HMMER::Hit#evalue344,9471
       attr_reader :num::Bio::HMMER::Hit#num347,9524
-      def initialize::Bio::HMMER::Hit#initialize350,9579
+      def initialize::Bio::HMMER::Hit#Bio::HMMER::Hit.new350,9579
       def each::Bio::HMMER::Hit#each360,9904
       def target_def::Bio::HMMER#target_def369,10060
       def append_hsp::Bio::HMMER#append_hsp378,10272
@@ -58,7 +58,7 @@ class HMMER::Bio::HMMER6,138
       attr_reader :target_frame::Bio::Hsp#target_frame433,11038
       attr_reader :csline::Bio::Hsp#csline436,11087
       attr_reader :rfline::Bio::Hsp#rfline439,11138
-      def initialize::Bio::Hsp#initialize442,11184
+      def initialize::Bio::Hsp#Bio::Hsp.new442,11184
       def set_alignment::Bio::Hsp#set_alignment464,11779
       def query_seq::Bio::Hsp#query_seq489,12836
       def target_seq::Bio::Hsp#target_seq494,12920

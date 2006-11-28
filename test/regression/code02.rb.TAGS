@@ -1,7 +1,7 @@
 
-./data/code02.rb,767
+./data/code02.rb,764
       class Hit::Hit3,53
-        def initialize::Hit#initialize4,85
+        def initialize::Hit#Hit.new4,85
         attr_reader :hsps::Hit#hsps7,127
         attr_accessor :query_id, :query_def, :query_len,::Hit#query_id8,153
         attr_accessor :query_id, :query_def, :query_len,::Hit#query_def8,153
