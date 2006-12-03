@@ -3,7 +3,10 @@ ISHITSUKA as part of the irb project. Now irb has moved into the main Ruby
 source tree rtags has become an independent project.
 
 At this point you can just run rtags in lieu of ctags, provided irb is
-installed on your system. It works alright!
+installed on your system. It works alright! You may see quite a
+number of warning messages (certainly with projects like Ruby on
+Rails) - usually because of multiple line definitions. It is safe to
+ignore those warnings.
 
 rtags is distributed as a gem or tgz file under a RUBY LICENSE and is
 hosted at rubyforge:

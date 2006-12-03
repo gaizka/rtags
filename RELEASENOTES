@@ -1,5 +1,9 @@
 rtags.rb - 
 
+Release Version: 0.94 (December 2006) by Pjotr Prins
+	Added support for ClassName.new tags - which point to the
+	  Class def initialize methods
+
 Release Version: 0.93 (August 2006) by Pjotr Prins
   Fixed bug where multiple lines were written to tags file - which
   	broke them for vi
