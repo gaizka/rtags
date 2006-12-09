@@ -1,3 +1,9 @@
-- Find modules with double colon notation like "BIO::MODULE::IO"
+IMPORTANT
+
+- Provide more command line switches (especially -R and perhaps -,
+	allowing for find . -name '*.rb' -print | rtags -)
+
+LATER 
+
 - Recognise 'alias :name' tokens
-- Provide more command line switches (especially -R)
+- Find modules with double colon notation like "BIO::MODULE::IO"

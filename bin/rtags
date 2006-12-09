@@ -9,7 +9,7 @@
 #   INSTALL: see file README
 #   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.93 (August 2006)'
+RTAGS_VERSION='0.94 (December 2006)'
 
 require 'optparse'
 require 'ostruct'
