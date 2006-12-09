@@ -1,9 +1,11 @@
 IMPORTANT
 
-- Provide more command line switches (especially -R and perhaps -,
+- Provide recurse command line switches (especially -R and perhaps -,
 	allowing for find . -name '*.rb' -print | rtags -)
 
 LATER 
 
 - Recognise 'alias :name' tokens
 - Find modules with double colon notation like "BIO::MODULE::IO"
+- Cache class names so classes can be found that lack an initialize
+	method
