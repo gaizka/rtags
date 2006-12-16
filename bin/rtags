@@ -37,6 +37,7 @@ USAGE
 
 $options = OpenStruct.new()
 $options.warning_level = 0
+$options.recurse = false
 
 opts = OptionParser.new() { |opts|
   opts.on_tail("-h", "--help", "Print this message") {
@@ -48,7 +49,8 @@ Examples:
 
     rtags *.rb
     rtags --vi -f vim_tags *.rb
-		rtags `find ~/src/ -name *.rb|grep -v _darcs`
+    rtags `find ~/src/ -name *.rb|grep -v _darcs`
+    rtags -R <dirname>
     
 EXAMPLE
     exit()
@@ -75,6 +77,12 @@ EXAMPLE
   opts.on("--debug_tokens", "Debug token information to stdout") do 
     $options.debug_tokens = true
   end
+  opts.on("-R", "--recurse", "Recurse into directories encountered in the list of supplied files looking for files ending with '.rb' extensions.",
+          "If the list of supplied files is empty and no file list is specified then the current directory (i.e. '.') is assumed.",
+          "dot directories (.subdir) are NOT followed.") do 
+    $options.recurse = true
+  end
+  
 }
 opts.parse!(ARGV)
 
@@ -573,7 +581,20 @@ module RTAGS
 
   class TAGS
     def initialize(files)
-      @files = files
+      if $options.recurse
+        @files = []
+        recurse = lambda do |fname|
+          if File.directory? fname
+            Dir.entries(fname).select {|f| f !~ /^\.(?:\.|\w+)?$/ }.map {|f| fname+'/'+f }.each(&recurse)
+          else
+            # is a file
+            @files.push(fname) if fname =~ /.rb$/i
+          end
+        end
+        files.each(&recurse)
+      else
+        @files = files
+      end
     end
   end
 
@@ -583,6 +604,10 @@ module RTAGS
       open($options.tagfile, $options.tagfile_mode) do |@output|
 
         for fn in @files
+          if File.directory? fn
+            puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
+            next
+          end
           output = []
           size = 0
 
@@ -611,6 +636,12 @@ module RTAGS
     def shipout
       output = []
       for fn in @files
+        
+        if File.directory? fn
+          puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
+          next
+        end
+        
         $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
         parser = Parser.new(fn) 
         parser.scan do |tk|
@@ -647,3 +678,4 @@ else
   tags = RTAGS::EMACS_TAGS.new(ARGV)
 end
 tags.shipout
+print "\nEnd - tagfile generated\n"
