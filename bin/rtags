@@ -9,7 +9,7 @@
 #   INSTALL: see file README
 #   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.94 (December 2006)'
+RTAGS_VERSION='0.95 (December 2006)'
 
 require 'optparse'
 require 'ostruct'
@@ -17,16 +17,16 @@ require 'ostruct'
 usage = <<USAGE
 
         rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA
-				  improvements by Pjotr Prins
+				  improvements by Pjotr Prins and Chetan Patil
         
         A Ruby tool for using Ruby tags rendering more tags than
         other tools for use with vim or emacs
-        
-        http://rubyforge.org/projects/rtags/ - maintainer Pjotr Prins
+       
+        For info see http://rtags.rubyforge.org/
 
         usage:
 
-                rtags [--vi] filenames
+                rtags [--vi] [-R] filenames
                 rtags --help
 
         by default creates an emacs tags file. With the --vi switch
@@ -41,22 +41,22 @@ $options.recurse = false
 
 opts = OptionParser.new() { |opts|
   opts.on_tail("-h", "--help", "Print this message") {
-     print(usage)
+ 		print(usage)
     print(opts)
     print <<EXAMPLE
     
 Examples:
 
     rtags *.rb
+    rtags -R <path>
     rtags --vi -f vim_tags *.rb
     rtags `find ~/src/ -name *.rb|grep -v _darcs`
-    rtags -R <dirname>
     
 EXAMPLE
     exit()
   }
    
-  opts.on("-f tagfile", String, "Output to tagfile (default 'TAGS')") do | s |
+  opts.on("-f tagfile", String, "Output to tagfile") do | s |
     $options.tagfile = s
   end
   opts.on("-a", "append mode") do 
@@ -71,18 +71,15 @@ EXAMPLE
   opts.on("--quiet", "Quiet mode") do 
     $options.quiet = true
   end
-  opts.on("--debug", "Debug output to stdout") do 
+  opts.on("--debug", "Debug output to stderr") do 
     $options.debug = true
   end
   opts.on("--debug_tokens", "Debug token information to stdout") do 
     $options.debug_tokens = true
   end
-  opts.on("-R", "--recurse", "Recurse into directories encountered in the list of supplied files looking for files ending with '.rb' extensions.",
-          "If the list of supplied files is empty and no file list is specified then the current directory (i.e. '.') is assumed.",
-          "dot directories (.subdir) are NOT followed.") do 
+  opts.on("-R", "--recurse", "Recurse path for .rb files (default '.')") do 
     $options.recurse = true
   end
-  
 }
 opts.parse!(ARGV)
 
@@ -95,6 +92,9 @@ if $options.tagfile == nil
 end
 $options.tagfile_mode = 'w' if $options.tagfile_mode == nil
 $options.warning_level = -1 if $options.quiet
+if $options.recurse and ARGV.size==0
+	ARGV.push '.'
+end
 
 print "\nrtags.rb #{RTAGS_VERSION} writing to file '#{$options.tagfile}'\n" if !$options.quiet
 
@@ -105,7 +105,7 @@ require "irb/ruby-lex"
 require "irb/ruby-token"
 
 module RTAGS
-  @RCS_ID='-rtags.rb 0.92-'
+  @RCS_ID='-rtags.rb 0.95 -'
 
   class RTToken
     def initialize(readed, context, name, token)
@@ -678,4 +678,4 @@ else
   tags = RTAGS::EMACS_TAGS.new(ARGV)
 end
 tags.shipout
-print "\nEnd - tagfile generated\n"
+$stderr.print "\nEnd - tagfile generated" if !$options.quiet

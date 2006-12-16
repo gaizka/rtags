@@ -3,6 +3,7 @@
 
 require 'test/unit'
 
+# Re-initialise regression files (copy current to expect)
 if ARGV.shift=='-i'
   Dir.chdir('regression')
   print `rm -v *.expect`
@@ -13,8 +14,8 @@ end
 
 # run regression tests
 
-def regression_test basedir,file
-  rtags = 'ruby '+basedir+'/bin/rtags'
+def regression_test basedir,file,switches=''
+  rtags = 'ruby '+basedir+'/bin/rtags'+' '+switches
   datafn = basedir+'/test/regression/'+File.basename(file)
   cmd = "#{rtags} #{file}"
   print `#{cmd} --quiet -f #{datafn}.TAGS`
@@ -29,4 +30,5 @@ files = Dir.glob(File.dirname(__FILE__) + "/data/*")
 files.each do | file |
   regression_test basedir,file
 end
+regression_test basedir,'recurse','-R'
 $stderr.print "\nFinalised regression tests\n"

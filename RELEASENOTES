@@ -1,5 +1,9 @@
 rtags.rb - 
 
+Release Version: 0.95 (December 2006) by Pjotr Prins
+	Added -R/--recurse switch by Chetan Patil
+	Added regression tests for recursion
+
 Release Version: 0.94 (December 2006) by Pjotr Prins
 	Added support for ClassName.new tags - which point to the
 	  Class def initialize methods

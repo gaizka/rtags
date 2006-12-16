@@ -1,7 +1,7 @@
 IMPORTANT
 
-- Provide recurse command line switches (especially -R and perhaps -,
-	allowing for find . -name '*.rb' -print | rtags -)
+- Provide - command line switch, allowing for 
+	  find . -name '*.rb' -print | rtags -
 
 LATER 
 
