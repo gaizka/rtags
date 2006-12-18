@@ -1,9 +1,16 @@
 #!/bin/sh
 
+progname=rtags
+tmpdir=/tmp
+version=`cat bin/VERSION`
+pkgname=$progname-$version
+pkgdir=$tmpdir/$pkgname
+cwd=`pwd`
+
 if [ ! -d test ]; then echo "Run from base directory!" ; exit ; fi
 
 echo -n "Release "
-cat bin/VERSION
+echo $version
 cd test
 ruby runner.rb
 cd ..
@@ -13,8 +20,13 @@ read
 rm *.gem
 rm *.tgz
 
+# Make the gem
 ruby ./scripts/rtags.gemspec
 
-version=`cat ./bin/VERSION`
-tar cvzf rtags-$version.tgz --exclude *.svn* bin/* test/* doc/* install.sh README TODO LICENSE.txt  RELEASENOTES
-
+# Make the tgz
+mkdir $pkgdir
+cp -vau bin test doc install.sh README TODO LICENSE.txt RELEASENOTES $pkgdir
+cd $tmpdir
+tar cvzf $pkgname.tgz --exclude *.svn* $pkgname/*
+cd $cwd
+cp $tmpdir/$pkgname.tgz .

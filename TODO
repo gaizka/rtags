@@ -1,14 +1,16 @@
-IMPORTANT
+TODO
 
-- Provide - command line switch, allowing for 
-	  find . -name '*.rb' -print | rtags -
-
-LATER 
+For version 1.0:
 
 - Recognise 'alias :name' tokens
+
+Later:
+
 - Find modules with double colon notation like "BIO::MODULE::IO"
 - Cache class names so classes can be found that lack an initialize
 	method
+- Provide - command line switch, allowing for 
+	  find . -name '*.rb' -print | rtags -
 
 MUSINGS
 
