@@ -579,16 +579,38 @@ module RTAGS
     end
   end
 
+	module Filter
+
+		def Filter::skipdir name
+			if name =~ /^(\.svn|_darcs|CVS|CVSROOT)/
+				print "Skipping boring directory #{name}\n"
+				return true
+			end
+			false
+		end
+
+		def Filter::skipfile name
+	  	if name =~ /.rb$/i
+				return false
+			end
+			true
+		end
+		
+	end
+	
   class TAGS
     def initialize(files)
       if $options.recurse
         @files = []
         recurse = lambda do |fname|
-          if File.directory? fname
+          if File.directory? fname and not Filter::skipdir(fname)
             Dir.entries(fname).select {|f| f !~ /^\.(?:\.|\w+)?$/ }.map {|f| fname+'/'+f }.each(&recurse)
           else
             # is a file
-            @files.push(fname) if fname =~ /.rb$/i
+						if not Filter::skipfile(fname)
+	            # @files.push(fname) if fname =~ /.rb$/i
+	            @files.push(fname)
+						end
           end
         end
         files.each(&recurse)
