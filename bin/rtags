@@ -9,7 +9,7 @@
 #   INSTALL: see file README
 #   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.95 (December 2006)'
+RTAGS_VERSION='0.96 (April 2007)'
 
 require 'optparse'
 require 'ostruct'
@@ -705,4 +705,5 @@ else
   tags = RTAGS::EMACS_TAGS.new(ARGV)
 end
 tags.shipout
-$stderr.print "\nEnd - tagfile generated" if !$options.quiet
+print "\n"
+$stderr.print "\nEnd - tagfile generated\n" if !$options.quiet

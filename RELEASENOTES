@@ -1,5 +1,9 @@
 rtags.rb - 
 
+Release Version: 0.96 (April 2006) by Pjotr Prins
+	Improved filtering on repository files (skip _darcs, CVS, .SVN)
+	Test for hash bang Ruby - if no .rb extension
+
 Release Version: 0.95 (December 2006) by Pjotr Prins
 	Added -R/--recurse switch by Chetan Patil
 	Added regression tests for recursion

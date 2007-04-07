@@ -9,29 +9,29 @@ Later:
 - Find modules with double colon notation like "BIO::MODULE::IO"
 - Cache class names so classes can be found that lack an initialize
 	method
-- Provide - command line switch, allowing for 
+- Provide - command line switch, allowing for
 	  find . -name '*.rb' -print | rtags -
 
 MUSINGS
 
-I am thinking of making vim the default target. I have the impression           
-it is the favoured editor these days.                                           
-                                                                                
+I am thinking of making vim the default target. I have the impression
+it is the favoured editor these days.
+
 Apart from adding the - switch at some point in the future it would
 be neat to have smarter tags. For one, if a class has not initialize
 method we would like to jump to the class definition on
 Classname.new. If we were to store the tags we find in memory
 (instead of just writing them out, as is the current behaviour) it
-would be trivial to implement.  
+would be trivial to implement.
 
 Also some tokens (alias) and multilines are not handled correctly.
-Try:                                                                            
-                                                                                
-cd ./test                                                                       
-ruby ../bin/rtags -R                                                            
-                                                                                
-and you get                                                                     
-                                                                                
-Warn: parse error in <./data/report.rb> in line 170, pos 4                      
-                                                                                
+
+Try:
+
+cd ./test                                                                      ruby ../bin/rtags -R
+
+and you get
+
+Warn: parse error in <./data/report.rb> in line 170, pos 4
+
 which is an unrecognised alias.
