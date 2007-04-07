@@ -581,18 +581,23 @@ module RTAGS
 
 	module Filter
 
+		# Test for boring repository directories that should be skipped
 		def Filter::skipdir name
-			if name =~ /^(\.svn|_darcs|CVS|CVSROOT)/
-				print "Skipping boring directory #{name}\n"
+			if name =~ /\/(\.svn|_darcs|CVS)/
+				print "\nSkipping boring directory #{name}"
 				return true
 			end
 			false
 		end
 
+		# Test whether this is a Ruby file
 		def Filter::skipfile name
 	  	if name =~ /.rb$/i
 				return false
 			end
+			# OK - test for magic hash bang
+			firstline = File.new(name).gets
+			return false if firstline =~ /^#\!/ and firstline =~ /ruby/i
 			true
 		end
 		
@@ -607,7 +612,7 @@ module RTAGS
             Dir.entries(fname).select {|f| f !~ /^\.(?:\.|\w+)?$/ }.map {|f| fname+'/'+f }.each(&recurse)
           else
             # is a file
-						if not Filter::skipfile(fname)
+						if File.file?(fname) and not Filter::skipfile(fname)
 	            # @files.push(fname) if fname =~ /.rb$/i
 	            @files.push(fname)
 						end
