@@ -3,9 +3,14 @@ TODO
 For version 1.0:
 
 - Recognise 'alias :name' tokens
+- include the argument list and an end of line $ pattern (at least the          
+  first opening parenthesis should be included in the pattern)                    
+- indicate whether the entry is a c(lass), a m(odule), or a f (method)          
+  like ctags
 
 Later:
 
+- Fix class Foo::Bar to show as such in the TAGS file
 - Find modules with double colon notation like "BIO::MODULE::IO"
 - Cache class names so classes can be found that lack an initialize
 	method
@@ -13,9 +18,6 @@ Later:
 	  find . -name '*.rb' -print | rtags -
 
 MUSINGS
-
-I am thinking of making vim the default target. I have the impression
-it is the favoured editor these days.
 
 Apart from adding the - switch at some point in the future it would
 be neat to have smarter tags. For one, if a class has not initialize
