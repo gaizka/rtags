@@ -10,6 +10,7 @@ For version 1.0:
 
 Later:
 
+- Add switch for not following symlinks
 - Fix class Foo::Bar to show as such in the TAGS file
 - Find modules with double colon notation like "BIO::MODULE::IO"
 - Cache class names so classes can be found that lack an initialize
