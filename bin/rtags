@@ -583,7 +583,7 @@ module RTAGS
 
 		# Test for boring repository directories that should be skipped
 		def Filter::skipdir name
-			if name =~ /\/(\.svn|\.hg|_darcs|CVS)/
+			if name =~ /\/(\.svn|\.hg|_darcs|CVS|\.git)/
 				print "\nSkipping boring directory #{name}"
 				return true
 			end
