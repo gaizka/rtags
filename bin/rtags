@@ -450,7 +450,12 @@ module RTAGS
 
     def parse_alias(context, single, tk, &block)
       skip_tkspace
-      name = get_tk.name
+      if (token = get_tk).is_a? TkSYMBEG
+        # Name is in next token
+        token = get_tk
+      end
+
+      name = token.name
       if context
         if single == SINGLE
           yield RTSingleAlias.new(get_tkreaded, context, name, tk)
