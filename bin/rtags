@@ -48,6 +48,7 @@ opts = OptionParser.new() { |opts|
 Examples:
 
     rtags *.rb
+    rtags -x *.rb
     rtags -R <path>
     rtags --vi -f vim_tags *.rb
     rtags `find ~/src/ -name *.rb|grep -v _darcs`
@@ -67,6 +68,12 @@ EXAMPLE
   end
   opts.on("--vi", "Use vi type tags (default is emacs)") do 
     $options.vi = true
+  end
+  opts.on("-x", "Print cross reference file to stdout") do
+    $options.xref = true
+  end
+  opts.on("-b", "When using -x, only print base name. E.g., print only 'method' and not '::Module::Class#method'") do
+    $options.xref_only_base = true
   end
   opts.on("--quiet", "Quiet mode") do 
     $options.quiet = true
@@ -96,7 +103,7 @@ if $options.recurse and ARGV.size==0
 	ARGV.push '.'
 end
 
-print "\nrtags.rb #{RTAGS_VERSION} writing to file '#{$options.tagfile}'\n" if !$options.quiet
+print "\nrtags.rb #{RTAGS_VERSION} writing to file '#{$options.tagfile}'\n" if (!$options.quiet && !$options.xref)
 
 require "e2mmap"
 require "tracer"
@@ -239,7 +246,7 @@ module RTAGS
 		# Scan +@input_file_name+ for tags and yields each tag
 
     def scan(&block)
-      print "\nParsing #{@input_file_name}..." if !$options.quiet
+      print "\nParsing #{@input_file_name}..." if (!$options.quiet && !$options.xref)
       File.open(@input_file_name) do |input|
         @tokens = []
         @unget_readed = []
@@ -450,7 +457,12 @@ module RTAGS
 
     def parse_alias(context, single, tk, &block)
       skip_tkspace
-      name = get_tk.name
+      if (token = get_tk).is_a? TkSYMBEG
+        # Name is in next token
+        token = get_tk
+      end
+
+      name = token.name
       if context
         if single == SINGLE
           yield RTSingleAlias.new(get_tkreaded, context, name, tk)
@@ -583,7 +595,7 @@ module RTAGS
 
 		# Test for boring repository directories that should be skipped
 		def Filter::skipdir name
-			if name =~ /\/(\.svn|\.hg|_darcs|CVS)/
+			if name =~ /\/(\.svn|\.hg|_darcs|CVS|\.git)/
 				print "\nSkipping boring directory #{name}"
 				return true
 			end
@@ -691,6 +703,44 @@ module RTAGS
       end
     end
   end
+
+  class XREF_TAGS < TAGS
+    # Print cross ref file (like ctags -x)
+    def shipout
+      output = []
+      for fn in @files
+        if File.directory? fn
+          puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
+          next
+        end
+
+        size = 0
+        
+        $stderr.printf "--\n-- parse file: %s\n", fn if $options.debug
+        parser = Parser.new(fn)
+        parser.scan do |tk|
+          $stderr.print tk, "\n" if $options.debug
+          line = tk.readed.split(/\n/)[0]
+          output.push sprintf("%-16s %4d %-16s %s\n",
+                              tk.name,
+                              tk.line_no,
+                              fn,
+                              line)
+
+          unless $options.xref_only_base
+            output.push sprintf("%-16s %4d %-16s %s\n",
+                                tk.abs_name,
+                                tk.line_no,
+                                fn,
+                                line)
+          end
+        end
+      end
+      puts output.join
+    end
+  end
+
+  
 end
 
 if ARGV.size == 0 or ARGV[0] == '--help'
@@ -701,9 +751,11 @@ end
 
 if $options.vi
   tags = RTAGS::VI_TAGS.new(ARGV)
+elsif $options.xref
+  tags = RTAGS::XREF_TAGS.new(ARGV)
 else
   tags = RTAGS::EMACS_TAGS.new(ARGV)
 end
 tags.shipout
-print "\n"
-$stderr.print "\nEnd - tagfile generated\n" if !$options.quiet
+print "\n" if !$options.xref
+$stderr.print "\nEnd - tagfile generated\n" if (!$options.quiet && !$options.xref)
