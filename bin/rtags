@@ -9,7 +9,7 @@
 #   INSTALL: see file README
 #   RELEASE NOTES: see file RELEASENOTES
 
-RTAGS_VERSION='0.96 (April 2007)'
+RTAGS_VERSION='0.97 (October 2008)'
 
 require 'optparse'
 require 'ostruct'
@@ -17,7 +17,7 @@ require 'ostruct'
 usage = <<USAGE
 
         rtags #{RTAGS_VERSION} (Ruby tags) by Keiju ISHITSUKA
-				  improvements by Pjotr Prins and Chetan Patil
+				  improvements by Pjotr Prins, Chetan Patil, Gaizka Villane
         
         A Ruby tool for using Ruby tags rendering more tags than
         other tools for use with vim or emacs
