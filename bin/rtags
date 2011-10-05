@@ -39,8 +39,8 @@ $options = OpenStruct.new()
 $options.warning_level = 0
 $options.recurse = false
 
-opts = OptionParser.new() { |opts|
-  opts.on_tail("-h", "--help", "Print this message") {
+OptionParser.new do |opts|
+  opts.on_tail("-h", "--help", "Print this message") do
  		print(usage)
     print(opts)
     print <<EXAMPLE
@@ -55,15 +55,15 @@ Examples:
     
 EXAMPLE
     exit()
-  }
+  end
    
-  opts.on("-f tagfile", String, "Output to tagfile") do | s |
+  opts.on("-f tagfile", String, "Output to tagfile") do |s|
     $options.tagfile = s
   end
   opts.on("-a", "append mode") do 
     $options.tagfile_mode = 'a'
   end
-  opts.on("-w level", Integer, "Warning level (default 0)") do | w |
+  opts.on("-w level", Integer, "Warning level (default 0)") do |w|
     $options.warning_level = w
   end
   opts.on("--vi", "Use vi type tags (default is emacs)") do 
@@ -87,8 +87,7 @@ EXAMPLE
   opts.on("-R", "--recurse", "Recurse path for .rb files (default '.')") do 
     $options.recurse = true
   end
-}
-opts.parse!(ARGV)
+end.parse!(ARGV)
 
 if $options.tagfile == nil
   if $options.vi
@@ -99,7 +98,7 @@ if $options.tagfile == nil
 end
 $options.tagfile_mode = 'w' if $options.tagfile_mode == nil
 $options.warning_level = -1 if $options.quiet
-if $options.recurse and ARGV.size==0
+if $options.recurse and ARGV.size == 0
 	ARGV.push '.'
 end
 
@@ -428,7 +427,7 @@ module RTAGS
           end
         else
 					warn('unrecognised token',1,name_t2)
-          break
+          #break
         end
         yield RTSingleMethod.new(get_tkreaded, context, name, tk)
 
@@ -640,9 +639,9 @@ module RTAGS
   class EMACS_TAGS < TAGS
 		# Create the tags file in emacs mode
     def shipout
-      open($options.tagfile, $options.tagfile_mode) do |@output|
-
-        for fn in @files
+      open($options.tagfile, $options.tagfile_mode) do |out|
+        @output = out
+        @files.each do |fn|
           if File.directory? fn
             puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
             next
@@ -674,8 +673,7 @@ module RTAGS
 		# Create the tags file in vi(m) mode
     def shipout
       output = []
-      for fn in @files
-        
+      @files.each do |fn|
         if File.directory? fn
           puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
           next
@@ -694,7 +692,6 @@ module RTAGS
                                 tk.abs_name,
                                 fn,
                                 line)
-        
         end
       end
 			# sort entries
@@ -708,7 +705,7 @@ module RTAGS
     # Print cross ref file (like ctags -x)
     def shipout
       output = []
-      for fn in @files
+      @files.each do |fn|
         if File.directory? fn
           puts "\nWarning: #{fn} is a directory - SKIPPING. Specify --recurse option to recurse into directories.\n"
           next
