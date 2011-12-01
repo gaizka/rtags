@@ -607,7 +607,7 @@ module RTAGS
 				return false
 			end
 			# OK - test for magic hash bang
-			firstline = File.new(name).gets
+			firstline = File.new(name, :encoding => "BINARY").gets
 			return false if firstline =~ /^#\!/ and firstline =~ /ruby/i
 			true
 		end
