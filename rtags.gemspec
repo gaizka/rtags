@@ -1,10 +1,9 @@
-require 'rubygems'
+# -*- encoding: utf-8 -*-
+Kernel.load File.expand_path('../lib/rtags/version.rb', __FILE__)
 
-version = `cat ./bin/VERSION`.strip
-
-spec = Gem::Specification.new do |s|
+Gem::Specification.new do |s|
 	s.name = 'rtags'
-	s.version = version
+	s.version = Rtags::VERSION
 	s.platform = Gem::Platform::RUBY
 	s.summary = "rtags is a Ruby replacement for ctags - allowing for name navigation in source code using vim, emacs and others"
 	s.description = "This is the original commit of the rtags source code as written by Keiju ISHITSUKA as part of the irb project. Now irb has moved into the main Ruby source tree rtags has become an independent project" 
@@ -16,15 +15,15 @@ spec = Gem::Specification.new do |s|
 	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../lib/*")
 
 	# tests
-	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/*")
-	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/data/*")
-	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/regression/*")
-	s.test_file = File.dirname(__FILE__) + '/../test/runner.rb'
+#	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/*")
+#	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/data/*")
+#	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../test/regression/*")
+#	s.test_file = File.dirname(__FILE__) + '/../test/runner.rb'
 	
 	# binaries
 	s.files = s.files + Dir.glob(File.dirname(__FILE__) + "/../bin/*")
 	s.bindir = 'bin'
-	s.executables << 'rtags'
+	s.executable = 'rtags'
 	
 	s.required_ruby_version = '>= 1.8.1'
 	s.autorequire = 'irb'
@@ -34,9 +33,4 @@ spec = Gem::Specification.new do |s|
 	s.rubyforge_project = "rtags"
 	s.homepage = "http://rtags.rubyforge.org"
 	s.has_rdoc = false
-end
-
-if $0==__FILE__
-	Gem.manage_gems
-	Gem::Builder.new(spec).build
 end

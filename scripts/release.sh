@@ -25,7 +25,7 @@ ruby ./scripts/rtags.gemspec
 
 # Make the tgz
 mkdir $pkgdir
-cp -vau bin test doc install.sh README TODO LICENSE.txt RELEASENOTES $pkgdir
+cp -va bin test doc install.sh README TODO LICENSE.txt RELEASENOTES $pkgdir
 cd $tmpdir
 tar cvzf $pkgname.tgz --exclude *.svn* $pkgname/*
 cd $cwd
