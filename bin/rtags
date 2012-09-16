@@ -709,7 +709,7 @@ module RTAGS
       end
 			# sort entries
       open($options.tagfile, $options.tagfile_mode) do |out|
-        out << output.sort!
+        out << output.sort!.join
       end
     end
   end
