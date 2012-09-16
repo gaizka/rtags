@@ -366,11 +366,24 @@ module RTAGS
       end
     end
 
+    # Get the full name of the constant including namespaces
+    def parse_full_constant_name(name_token)
+      name = name_token.name
+      if peek_tk.kind_of? TkCOLON2
+        get_tk # skip the ::
+        namespaced_name_token = get_tk
+        rest = parse_full_constant(namespaced_name_token)
+        name += '::' + rest unless rest.nil?
+      end
+
+      name
+    end
+
     def parse_class(context, single, tk, &block)
       skip_tkspace
       case name_t = get_tk
       when TkCONSTANT
-        name = name_t.name
+        name = parse_full_constant_name(name_t)
         if single == SINGLE
           yield RTSingleClass.new(get_tkreaded, context, name, tk)
         else
