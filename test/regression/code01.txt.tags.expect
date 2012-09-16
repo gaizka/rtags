@@ -1,10 +1,7 @@
-::That	./data/code01.txt	/^module That/
-::That::Ritz	./data/code01.txt	/^class Ritz/
-::That::Ritz#mymy	./data/code01.txt	/^        def mymy/
-::That::Sothere	./data/code01.txt	/^        class Sothere/
-::That::Sothere#mymy	./data/code01.txt	/^                def mymy/
-Ritz	./data/code01.txt	/^class Ritz/
-Sothere	./data/code01.txt	/^        class Sothere/
-That	./data/code01.txt	/^module That/
-mymy	./data/code01.txt	/^                def mymy/
-mymy	./data/code01.txt	/^        def mymy/
+
+./data/code01.txt,187
+module That::That1,0
+        class Sothere::That::Sothere2,20
+                def mymy::That::Sothere#mymy3,58
+class Ritz::That::Ritz7,92
+        def mymy::That::Ritz#mymy9,140
