@@ -372,7 +372,7 @@ module RTAGS
       if peek_tk.kind_of? TkCOLON2
         get_tk # skip the ::
         namespaced_name_token = get_tk
-        rest = parse_full_constant(namespaced_name_token)
+        rest = parse_full_constant_name(namespaced_name_token)
         name += '::' + rest unless rest.nil?
       end
 
