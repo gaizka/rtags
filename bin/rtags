@@ -110,6 +110,11 @@ require "tracer"
 require "irb/ruby-lex"
 require "irb/ruby-token"
 
+class RubyLex
+  def identify_string_dvar
+  end
+end
+
 require "stringio"
 
 module RTAGS
