@@ -110,6 +110,13 @@ require "tracer"
 require "irb/ruby-lex"
 require "irb/ruby-token"
 
+class RubyLex
+  def identify_string_dvar
+  end
+end
+
+require "stringio"
+
 module RTAGS
   @RCS_ID='-rtags.rb 0.95 -'
 
@@ -246,13 +253,13 @@ module RTAGS
 
     def scan(&block)
       print "\nParsing #{@input_file_name}..." if (!$options.quiet && !$options.xref)
-      File.open(@input_file_name) do |input|
-        @tokens = []
-        @unget_readed = []
-        @readed = []
-        @scanner.set_input(input)
-        parse_statements(&block)
-      end
+
+      input = StringIO.new(File.read(@input_file_name) + "\n")
+      @tokens = []
+      @unget_readed = []
+      @readed = []
+      @scanner.set_input(input)
+      parse_statements(&block)
     end
 
 		# get the next token - fetching it from the temporary +@tokens+
@@ -372,7 +379,7 @@ module RTAGS
       if peek_tk.kind_of? TkCOLON2
         get_tk # skip the ::
         namespaced_name_token = get_tk
-        rest = parse_full_constant(namespaced_name_token)
+        rest = parse_full_constant_name(namespaced_name_token)
         name += '::' + rest unless rest.nil?
       end
 
